@@ -1,0 +1,262 @@
+var con1 = 0;
+var con2 = 0;
+var mat = 0;
+
+window.onload = function (){
+  draw(0,1001);
+}
+
+function draw(q_in, mat){
+con1 = q_in ;
+con2 = mat ;
+document.getElementById("range_1").innerHTML= q_in;
+
+//Data Selection
+
+if (mat == 1001){
+    var data = gold_nk;
+    }
+else if (mat == 1002){
+    var data = silver_nk;
+    }
+else if (mat == 1003){
+    var data = copper_nk;
+    }
+else if (mat == 1004){
+    var data = silicon_nk;
+    }
+else {
+    alert("Please select material");
+    }
+
+//Incident angle
+
+var q = q_in*Math.PI/180;
+var k = 0;
+var x_incident_list = [];
+var l_incident_list = [];
+var t_incident_list = [];
+var q_incident_list = [];
+
+for (k=0; k<101; k++){
+
+    x_incident_list.push(k*0.02-1);
+    l_incident_list.push(Math.abs(Math.tan(Math.PI/2-q)*(k*0.02-1)));
+    t_incident_list.push((-0.2)*Math.sin(q*(k*0.01)));
+    q_incident_list.push((0.2)*Math.cos(q*(k*0.01)));
+}
+
+//Reflection Calculation
+
+var d_pt = 145; // number of data points
+var i = 0;
+
+var x_list = [];
+var n_list = [];
+var k_list = [];
+var rRs_list = [];
+var rRp_list = [];
+var rs = complex(0,0);
+var rRs = 0;
+var rp = complex(0,0);
+var rRp = 0;
+
+for (i=0; i<=d_pt; i++){
+
+    rs =    complex_div(
+            complex_sub(complex(Math.cos(q),0),complex_sqrt(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2)-Math.pow(Math.sin(q),2),2*data[i].n*data[i].k))),
+            complex_add(complex(Math.cos(q),0),complex_sqrt(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2)-Math.pow(Math.sin(q),2),2*data[i].n*data[i].k))));
+    rRs =   Math.pow(complex_abs(rs),2);
+
+    rp =    complex_div(
+            complex_sub(complex_sqrt(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2)-Math.pow(Math.sin(q),2),2*data[i].n*data[i].k)),complex_mul(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2),2*data[i].n*data[i].k),complex(Math.cos(q),0))),
+            complex_add(complex_sqrt(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2)-Math.pow(Math.sin(q),2),2*data[i].n*data[i].k)),complex_mul(complex(Math.pow(data[i].n,2)-Math.pow(data[i].k,2),2*data[i].n*data[i].k),complex(Math.cos(q),0))));
+    rRp =   Math.pow(complex_abs(rp),2);
+
+    x_list.push(data[i].x);
+    n_list.push(data[i].n);
+    k_list.push(data[i].k);
+    rRs_list.push(rRs);
+    rRp_list.push(rRp);
+}
+
+//Integration
+
+var color = rgb_color;
+
+var j = 0;
+
+var red_list = [];
+var green_list = [];
+var blue_list = [];
+var red_s_sum = 0;
+var green_s_sum = 0;
+var blue_s_sum = 0;
+var red_p_sum = 0;
+var green_p_sum = 0;
+var blue_p_sum = 0;
+
+for (j=0; j<=d_pt; j++){
+
+    red_list.push(color[j].r);
+    green_list.push(color[j].g);
+    blue_list.push(color[j].b);
+
+    red_s_sum = red_s_sum + color[j].r*0.01*rRs_list[j] ;
+    green_s_sum = green_s_sum + color[j].g*0.01*rRs_list[j] ;
+    blue_s_sum = blue_s_sum + color[j].b*0.01*rRs_list[j] ;
+
+    red_p_sum = red_p_sum + color[j].r*0.01*rRp_list[j] ;
+    green_p_sum = green_p_sum + color[j].g*0.01*rRp_list[j] ;
+    blue_p_sum = blue_p_sum + color[j].b*0.01*rRp_list[j] ;
+
+}
+
+// Incident angle
+var data_inc = [
+    {
+        x: x_incident_list, 
+        y: l_incident_list,
+        name : 'Line',
+        mode: 'line',
+        line: {
+            color: 'blue',
+            width: 2,
+        }
+    },
+    {
+        x: t_incident_list, 
+        y: q_incident_list,
+        name : 'Angle',
+        mode: 'line',
+        line: {
+            color: 'red',
+            width: 2,
+        }
+    }
+];
+
+var layout_inc = {
+  margin: { t: 40 },
+  title: false,
+    xaxis: {
+        title: false,
+        showgrid: false,
+        zeroline: true,
+        showline: false,
+        showticklabels: false,
+        range : [-1, 1]
+    },
+    yaxis: {
+        title: false,
+        showgrid: false,
+        zeroline: true,
+        showline: false,
+        showticklabels: false,
+        range : [0, 1]
+    },
+    showlegend: false
+}
+
+// Refractive index, n and k
+var data_nk = [
+    {
+        x: x_list, 
+        y: n_list,
+        name : 'n',
+        mode: 'line',
+        line: {
+            color: 'blue',
+            width: 2,
+        }
+    },
+    {
+        x: x_list, 
+        y: k_list,
+        name : 'k',
+        mode: 'line',
+        line: {
+            color: 'red',
+            width: 2,
+        }
+    }
+];
+
+var layout_nk = {
+  margin: { t: 40 },
+  title: 'Refractive index',
+    xaxis: {
+        title: 'Energy (eV)',
+        showgrid: true,
+        zeroline: true,
+        showline: true,
+        range : [1.8, 3.25]
+    },
+    yaxis: {
+        title: 'n and k',
+        showgrid: true,
+        zeroline: true,
+        showline: true,
+        range : [0, 7]
+    },
+    showlegend: true
+}
+
+// Reflection, Rs and Rp
+var data_r = [
+    {
+        x: x_list, 
+        y: rRs_list,
+        name : 'Rs',
+        mode: 'line',
+        line: {
+            color: 'blue',
+            width: 2,
+        }
+    },
+    {
+        x: x_list, 
+        y: rRp_list,
+        name : 'Rp',
+        mode: 'line',
+        line: {
+            color: 'red',
+            width: 2,
+        }
+    }
+];
+
+var layout_r = {
+  margin: { t: 40 },
+  title: 'Reflection',
+    xaxis: {
+        title: 'Energy (eV)',
+        showgrid: true,
+        zeroline: true,
+        showline: true,
+        range : [1.8, 3.25]
+    },
+    yaxis: {
+        title: 'Reflection',
+        showgrid: true,
+        zeroline: true,
+        showline: true,
+        range : [0, 1.1]
+    },
+    showlegend: true
+}
+
+GRAPH1 = document.getElementById('graph_inc');
+GRAPH2 = document.getElementById('graph_nk');
+GRAPH3 = document.getElementById('graph_r');
+Plotly.newPlot( GRAPH1, data_inc, layout_inc );
+Plotly.newPlot( GRAPH2, data_nk, layout_nk );
+Plotly.newPlot( GRAPH3, data_r, layout_r );
+
+var snap = Snap("#svgout"); 
+
+var box_1 = snap.rect(10,30,150,150).attr({ fill: 'rgb('+red_s_sum+','+green_s_sum+','+blue_s_sum+')', stroke: 'black', 'strokeWidth': 5 });
+var box_2 = snap.rect(180,30,150,150).attr({ fill: 'rgb('+red_p_sum+','+green_p_sum+','+blue_p_sum+')', stroke: 'black', 'strokeWidth': 5 });
+var text_1 = snap.text(10,20,'Rs Color');
+var text_2 = snap.text(180,20,'Rp Color');
+}

@@ -1,0 +1,65 @@
+function complex(a,b){
+	return { "re": a, "im": b};
+}
+
+function complex_conju(c){
+	return { "re": c.re, "im": (-1)*c.im};
+}
+
+function complex_abs(c){
+	return Math.sqrt(Math.pow(c.re,2) + Math.pow(c.im,2));
+}
+
+function complex_square(c){
+	return { "re": Math.pow(c.re,2) - Math.pow(c.im,2),
+			 "im": 2*c.re*c.im };
+}
+
+function complex_sqrt(c){
+
+	if(c.re<0 && c.im>=0){
+		return { "re": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.cos(0.5*(Math.atan(c.im/c.re)+Math.PI)),
+				 "im": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.sin(0.5*(Math.atan(c.im/c.re)+Math.PI)) };
+	}
+
+	else if(c.re<0 && c.im<0){
+		return { "re": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.cos(0.5*(Math.atan(c.im/c.re)-Math.PI)),
+				 "im": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.sin(0.5*(Math.atan(c.im/c.re)-Math.PI)) };
+	}
+
+	else if(c.re==0 && c.im>0){
+		return { "re": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.cos(0.5*(Math.PI/2)),
+				 "im": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.sin(0.5*(Math.PI/2)) };
+	}
+
+	else if(c.re==0 && c.im<0){
+		return { "re": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.cos(0.5*(-1*Math.PI/2)),
+				 "im": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.sin(0.5*(-1*Math.PI/2)) };
+	}
+
+	else{
+		return { "re": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.cos(0.5*Math.atan(c.im/c.re)),
+				 "im": Math.pow(Math.pow(c.re,2)+Math.pow(c.im,2),0.25)*Math.sin(0.5*Math.atan(c.im/c.re)) };
+	}
+
+}
+
+function complex_add(c1,c2){
+	return { "re": c1.re + c2.re,
+			 "im": c1.im + c2.im };
+}
+
+function complex_sub(c1,c2){
+	return { "re": c1.re - c2.re,
+			 "im": c1.im - c2.im };
+}
+
+function complex_mul(c1,c2){
+	return { "re": c1.re*c2.re - c1.im*c2.im,
+			 "im": c1.re*c2.im + c1.im*c2.re };
+}
+
+function complex_div(c1,c2){
+	return { "re": (c1.re*c2.re + c1.im*c2.im) / (Math.pow(c2.re,2) + Math.pow(c2.im,2)),
+			 "im": (c1.im*c2.re - c1.re*c2.im) / (Math.pow(c2.re,2) + Math.pow(c2.im,2)) };
+}
